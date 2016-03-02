@@ -4,23 +4,23 @@ describe RubyRTF::Document do
   it 'provides a font table' do
     doc = RubyRTF::Document.new
     table = nil
-    lambda { table = doc.font_table }.should_not raise_error
-    table.should_not be_nil
+    expect(lambda { table = doc.font_table }).not_to raise_error
+    expect(table).not_to be_nil
   end
 
   context 'colour table' do
     it 'provides a colour table' do
       doc = RubyRTF::Document.new
       tbl = nil
-      lambda { tbl = doc.colour_table }.should_not raise_error
-      tbl.should_not be_nil
+      expect(lambda { tbl = doc.colour_table }).not_to raise_error
+      expect(tbl).not_to be_nil
     end
 
     it 'provdies access as color table' do
       doc = RubyRTF::Document.new
       tbl = nil
-      lambda { tbl = doc.color_table }.should_not raise_error
-      tbl.should == doc.colour_table
+      expect(lambda { tbl = doc.color_table }).not_to raise_error
+      expect(tbl).to eq doc.colour_table
     end
   end
 
@@ -28,11 +28,11 @@ describe RubyRTF::Document do
 
   context 'defaults to' do
     it 'character set ansi' do
-      RubyRTF::Document.new.character_set.should == :ansi
+      expect(RubyRTF::Document.new.character_set).to eq :ansi
     end
 
     it 'font 0' do
-      RubyRTF::Document.new.default_font.should == 0
+      expect(RubyRTF::Document.new.default_font).to eq 0
     end
   end
 end

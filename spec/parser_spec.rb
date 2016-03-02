@@ -8,35 +8,35 @@ describe RubyRTF::Parser do
 
   it 'parses hello world' do
     src = '{\rtf1\ansi\deff0 {\fonttbl {\f0 Times New Roman;}}\f0 \fs60 Hello, World!}'
-    lambda { parser.parse(src) }.should_not raise_error
+    expect(lambda { parser.parse(src) }).not_to raise_error
   end
 
   it 'returns a RTF::Document' do
     src = '{\rtf1\ansi\deff0 {\fonttbl {\f0 Times New Roman;}}\f0 \fs60 Hello, World!}'
     d = parser.parse(src)
-    d.is_a?(RubyRTF::Document).should be_true
+    expect(d.is_a?(RubyRTF::Document)).to be true
   end
 
   it 'parses a default font (\deffN)' do
     src = '{\rtf1\ansi\deff10 {\fonttbl {\f10 Times New Roman;}}\f0 \fs60 Hello, World!}'
     d = parser.parse(src)
-    d.default_font.should == 10
+    expect(d.default_font).to eq 10
   end
 
   context 'invalid document' do
     it 'raises exception if \rtf is missing' do
       src = '{\ansi\deff0 {\fonttbl {\f0 Times New Roman;}}\f0 \fs60 Hello, World!}'
-      lambda { parser.parse(src) }.should raise_error(RubyRTF::InvalidDocument)
+      expect(lambda { parser.parse(src) }).to raise_error(RubyRTF::InvalidDocument)
     end
 
     it 'raises exception if the document does not start with \rtf' do
       src = '{\ansi\deff0\rtf1 {\fonttbl {\f0 Times New Roman;}}\f0 \fs60 Hello, World!}'
-      lambda { parser.parse(src) }.should raise_error(RubyRTF::InvalidDocument)
+      expect(lambda { parser.parse(src) }).to raise_error(RubyRTF::InvalidDocument)
     end
 
     it 'raises exception if the {}s are unbalanced' do
       src = '{\rtf1\ansi\deff0 {\fonttbl {\f0 Times New Roman;}\f0 \fs60 Hello, World!}'
-      lambda { parser.parse(src) }.should raise_error(RubyRTF::InvalidDocument)
+      expect(lambda { parser.parse(src) }).to raise_error(RubyRTF::InvalidDocument)
     end
   end
 
@@ -44,126 +44,126 @@ describe RubyRTF::Parser do
     it 'parses text into the current section' do
       src = '{\rtf1\ansi\deff10 {\fonttbl {\f10 Times New Roman;}}\f0 \fs60 Hello, World!}'
       d = parser.parse(src)
-      d.sections.first[:text].should == 'Hello, World!'
+      expect(d.sections.first[:text]).to eq 'Hello, World!'
     end
 
     it 'adds a new section on {' do
       src = '{\rtf1 \fs60 Hello {\fs30 World}}'
       d = parser.parse(src)
-      d.sections.first[:modifiers][:font_size].should == 30
-      d.sections.first[:text].should == 'Hello '
+      expect(d.sections.first[:modifiers][:font_size]).to eq 30
+      expect(d.sections.first[:text]).to eq 'Hello '
 
-      d.sections.last[:modifiers][:font_size].should == 15
-      d.sections.last[:text].should == 'World'
+      expect(d.sections.last[:modifiers][:font_size]).to eq 15
+      expect(d.sections.last[:text]).to eq 'World'
     end
 
     it 'adds a new section on }' do
       src = '{\rtf1 \fs60 Hello {\fs30 World}\fs12 Goodbye, cruel world.}'
 
       section = parser.parse(src).sections
-      section[0][:modifiers][:font_size].should == 30
-      section[0][:text].should == 'Hello '
+      expect(section[0][:modifiers][:font_size]).to eq 30
+      expect(section[0][:text]).to eq 'Hello '
 
-      section[1][:modifiers][:font_size].should == 15
-      section[1][:text].should == 'World'
+      expect(section[1][:modifiers][:font_size]).to eq 15
+      expect(section[1][:text]).to eq 'World'
 
-      section[2][:modifiers][:font_size].should == 6
-      section[2][:text].should == 'Goodbye, cruel world.'
+      expect(section[2][:modifiers][:font_size]).to eq 6
+      expect(section[2][:text]).to eq 'Goodbye, cruel world.'
     end
 
     it 'inherits properly over {} groups' do
       src = '{\rtf1 \b\fs60 Hello {\i\fs30 World}\ul Goodbye, cruel world.}'
 
       section = parser.parse(src).sections
-      section[0][:modifiers][:font_size].should == 30
-      section[0][:modifiers][:bold].should be_true
-      section[0][:modifiers].has_key?(:italic).should be_false
-      section[0][:modifiers].has_key?(:underline).should be_false
-      section[0][:text].should == 'Hello '
+      expect(section[0][:modifiers][:font_size]).to eq 30
+      expect(section[0][:modifiers][:bold]).to be true
+      expect(section[0][:modifiers].has_key?(:italic)).to be false
+      expect(section[0][:modifiers].has_key?(:underline)).to be false
+      expect(section[0][:text]).to eq 'Hello '
 
-      section[1][:modifiers][:font_size].should == 15
-      section[1][:modifiers][:italic].should be_true
-      section[1][:modifiers][:bold].should be_true
-      section[1][:modifiers].has_key?(:underline).should be_false
-      section[1][:text].should == 'World'
+      expect(section[1][:modifiers][:font_size]).to eq 15
+      expect(section[1][:modifiers][:italic]).to be true
+      expect(section[1][:modifiers][:bold]).to be true
+      expect(section[1][:modifiers].has_key?(:underline)).to be false
+      expect(section[1][:text]).to eq 'World'
 
-      section[2][:modifiers][:font_size].should == 30
-      section[2][:modifiers][:bold].should be_true
-      section[2][:modifiers][:underline].should be_true
-      section[2][:modifiers].has_key?(:italic).should be_false
-      section[2][:text].should == 'Goodbye, cruel world.'
+      expect(section[2][:modifiers][:font_size]).to eq 30
+      expect(section[2][:modifiers][:bold]).to be true
+      expect(section[2][:modifiers][:underline]).to be true
+      expect(section[2][:modifiers].has_key?(:italic)).to be false
+      expect(section[2][:text]).to eq 'Goodbye, cruel world.'
     end
 
     it 'clears ul with ul0' do
       src = '{\rtf1 \ul\b Hello\b0\ul0 World}'
       section = parser.parse(src).sections
-      section[0][:modifiers][:bold].should be_true
-      section[0][:modifiers][:underline].should be_true
-      section[0][:text].should == 'Hello'
+      expect(section[0][:modifiers][:bold]).to be true
+      expect(section[0][:modifiers][:underline]).to be true
+      expect(section[0][:text]).to eq 'Hello'
 
-      section[1][:modifiers].has_key?(:bold).should be_false
-      section[1][:modifiers].has_key?(:underline).should be_false
-      section[1][:text].should == 'World'
+      expect(section[1][:modifiers][:bold]).to be_falsey
+      expect(section[1][:modifiers][:underline]).to be_falsey
+      expect(section[1][:text]).to eq 'World'
     end
   end
 
   context '#parse_control' do
     it 'parses a normal control' do
-      parser.parse_control("rtf")[0, 2].should == [:rtf, nil]
+      expect(parser.parse_control("rtf")[0, 2]).to eq [:rtf, nil]
     end
 
     it 'parses a control with a value' do
-      parser.parse_control("f2")[0, 2].should == [:f, 2]
+      expect(parser.parse_control("f2")[0, 2]).to eq [:f, 2]
     end
 
     context 'unicode' do
       %w(u21487* u21487).each do |code|
         it "parses #{code}" do
-          parser.parse_control(code)[0, 2].should == [:u, 21487]
+          expect(parser.parse_control(code)[0, 2]).to eq [:u, 21487]
         end
       end
 
       %w(u-21487* u-21487).each do |code|
         it "parses #{code}" do
-          parser.parse_control(code)[0, 2].should == [:u, -21487]
+          expect(parser.parse_control(code)[0, 2]).to eq [:u, -21487]
         end
       end
     end
 
     it 'parses a hex control' do
-      parser.parse_control("'7e")[0, 2].should == [:hex, '~']
+      expect(parser.parse_control("'7e")[0, 2]).to eq [:hex, '~']
     end
 
     it 'parses a hex control with a string after it' do
       ctrl, val, current_pos = parser.parse_control("'7e25")
-      ctrl.should == :hex
-      val.should == '~'
-      current_pos.should == 3
+      expect(ctrl).to eq :hex
+      expect(val).to eq '~'
+      expect(current_pos).to eq 3
     end
 
     context "encoding is windows-1252" do
       it 'parses a hex control' do
         parser.encoding = 'windows-1252'
-        parser.parse_control("'93")[0, 2].should == [:hex, '“']
+        expect(parser.parse_control("'93")[0, 2]).to eq [:hex, '“']
       end
     end
 
     [' ', '{', '}', '\\', "\r", "\n"].each do |stop|
       it "stops at a #{stop}" do
-        parser.parse_control("rtf#{stop}test")[0, 2].should == [:rtf, nil]
+        expect(parser.parse_control("rtf#{stop}test")[0, 2]).to eq [:rtf, nil]
       end
     end
 
     it 'handles a non-zero current position' do
-      parser.parse_control('Test ansi test', 5)[0, 2].should == [:ansi, nil]
+      expect(parser.parse_control('Test ansi test', 5)[0, 2]).to eq [:ansi, nil]
     end
 
     it 'advances the current positon' do
-      parser.parse_control('Test ansi{test', 5).last.should == 9
+      expect(parser.parse_control('Test ansi{test', 5).last).to eq 9
     end
 
     it 'advances the current positon past the optional space' do
-      parser.parse_control('Test ansi test', 5).last.should == 10
+      expect(parser.parse_control('Test ansi test', 5).last).to eq 10
     end
   end
 
@@ -172,7 +172,7 @@ describe RubyRTF::Parser do
       it "accepts #{type}" do
         src = "{\\rtf1\\#{type}\\deff0 {\\fonttbl {\\f0 Times New Roman;}}\\f0 \\fs60 Hello, World!}"
         doc = parser.parse(src)
-        doc.character_set.should == type.to_sym
+        expect(doc.character_set).to eq type.to_sym
       end
     end
   end
@@ -183,15 +183,15 @@ describe RubyRTF::Parser do
       doc = parser.parse(src)
 
       font = doc.font_table[0]
-      font.family_command.should == :roman
-      font.name.should == 'Times'
+      expect(font.family_command).to eq :roman
+      expect(font.name).to eq 'Times'
     end
 
     it 'parses an empty font table' do
       src = "{\\rtf1\\ansi\\ansicpg1252\\cocoartf1187\n{\\fonttbl}\n{\\colortbl;\\red255\\green255\\blue255;}\n}"
       doc = parser.parse(src)
 
-      doc.font_table.should == []
+      expect(doc.font_table).to eq []
     end
 
     context '#parse_font_table' do
@@ -200,19 +200,19 @@ describe RubyRTF::Parser do
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
 
-        tbl.length.should == 2
-        tbl[0].family_command.should == :roman
-        tbl[0].name.should == 'Times New Roman'
+        expect(tbl.length).to eq 2
+        expect(tbl[0].family_command).to eq :roman
+        expect(tbl[0].name).to eq 'Times New Roman'
 
-        tbl[1].family_command.should == :nil
-        tbl[1].name.should == 'Arial'
+        expect(tbl[1].family_command).to eq :nil
+        expect(tbl[1].name).to eq 'Arial'
       end
 
       it 'parses a font table without braces' do
         src = '\f0\froman\fcharset0 TimesNewRomanPSMT;}}'
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
-        tbl[0].name.should == 'TimesNewRomanPSMT'
+        expect(tbl[0].name).to eq 'TimesNewRomanPSMT'
       end
 
       it 'handles \r and \n in the font table' do
@@ -220,20 +220,20 @@ describe RubyRTF::Parser do
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
 
-        tbl.length.should == 2
-        tbl[0].family_command.should == :roman
-        tbl[0].name.should == 'Times New Roman'
+        expect(tbl.length).to eq 2
+        expect(tbl[0].family_command).to eq :roman
+        expect(tbl[0].name).to eq 'Times New Roman'
 
-        tbl[1].family_command.should == :nil
-        tbl[1].name.should == 'Arial'
+        expect(tbl[1].family_command).to eq :nil
+        expect(tbl[1].name).to eq 'Arial'
       end
 
       it 'the family command is optional' do
         src = '{\f0 Times New Roman;}}}'
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
-        tbl[0].family_command.should == :nil
-        tbl[0].name.should == 'Times New Roman'
+        expect(tbl[0].family_command).to eq :nil
+        expect(tbl[0].name).to eq 'Times New Roman'
       end
 
       it 'does not require the numbering to be incremental' do
@@ -241,33 +241,33 @@ describe RubyRTF::Parser do
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
 
-        tbl[77].family_command.should == :roman
-        tbl[77].name.should == 'Times New Roman'
+        expect(tbl[77].family_command).to eq :roman
+        expect(tbl[77].name).to eq 'Times New Roman'
 
-        tbl[3].family_command.should == :nil
-        tbl[3].name.should == 'Arial'
+        expect(tbl[3].family_command).to eq :nil
+        expect(tbl[3].name).to eq 'Arial'
       end
 
       it 'accepts the \falt command' do
         src = '{\f0\froman Times New Roman{\*\falt Courier New};}}'
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
-        tbl[0].name.should == 'Times New Roman'
-        tbl[0].alternate_name.should == 'Courier New'
+        expect(tbl[0].name).to eq 'Times New Roman'
+        expect(tbl[0].alternate_name).to eq 'Courier New'
       end
 
       it 'sets current pos to the closing }' do
         src = '{\f0\froman Times New Roman{\*\falt Courier New};}}'
-        parser.parse_font_table(src, 0).should == (src.length - 1)
+        expect(parser.parse_font_table(src, 0)).to eq (src.length - 1)
       end
 
       it 'accepts the panose command' do
         src = '{\f0\froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman{\*\falt Courier New};}}'
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
-        tbl[0].panose.should == '02020603050405020304'
-        tbl[0].name.should == 'Times New Roman'
-        tbl[0].alternate_name.should == 'Courier New'
+        expect(tbl[0].panose).to eq '02020603050405020304'
+        expect(tbl[0].name).to eq 'Times New Roman'
+        expect(tbl[0].alternate_name).to eq 'Courier New'
       end
 
       %w(flomajor fhimajor fdbmajor fbimajor flominor fhiminor fdbminor fbiminor).each do |type|
@@ -275,8 +275,8 @@ describe RubyRTF::Parser do
           src = "{\\f0\\#{type} Times New Roman;}}"
           parser.parse_font_table(src, 0)
           tbl = doc.font_table
-          tbl[0].name.should == 'Times New Roman'
-          tbl[0].theme.should == type[1..-1].to_sym
+          expect(tbl[0].name).to eq 'Times New Roman'
+          expect(tbl[0].theme).to eq type[1..-1].to_sym
         end
       end
 
@@ -285,8 +285,8 @@ describe RubyRTF::Parser do
           src = "{\\f0\\fprq#{pitch.first} Times New Roman;}}"
           parser.parse_font_table(src, 0)
           tbl = doc.font_table
-          tbl[0].name.should == 'Times New Roman'
-          tbl[0].pitch.should == pitch.last
+          expect(tbl[0].name).to eq 'Times New Roman'
+          expect(tbl[0].pitch).to eq pitch.last
         end
       end
 
@@ -294,16 +294,16 @@ describe RubyRTF::Parser do
         src = '{\f0{\*\fname Arial;}Times New Roman;}}'
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
-        tbl[0].name.should == 'Times New Roman'
-        tbl[0].non_tagged_name.should == 'Arial'
+        expect(tbl[0].name).to eq 'Times New Roman'
+        expect(tbl[0].non_tagged_name).to eq 'Arial'
       end
 
       it 'parses the charset' do
         src = '{\f0\fcharset87 Times New Roman;}}'
         parser.parse_font_table(src, 0)
         tbl = doc.font_table
-        tbl[0].name.should == 'Times New Roman'
-        tbl[0].character_set.should == 87
+        expect(tbl[0].name).to eq 'Times New Roman'
+        expect(tbl[0].character_set).to eq 87
       end
     end
   end
@@ -314,14 +314,14 @@ describe RubyRTF::Parser do
       doc = parser.parse(src)
 
       clr = doc.colour_table[0]
-      clr.red.should == 0
-      clr.green.should == 0
-      clr.blue.should == 0
+      expect(clr.red).to eq 0
+      expect(clr.green).to eq 0
+      expect(clr.blue).to eq 0
 
       clr = doc.colour_table[1]
-      clr.red.should == 127
-      clr.green.should == 2
-      clr.blue.should == 255
+      expect(clr.red).to eq 127
+      expect(clr.green).to eq 2
+      expect(clr.blue).to eq 255
     end
 
     it 'sets the first colour if missing' do
@@ -329,12 +329,12 @@ describe RubyRTF::Parser do
       doc = parser.parse(src)
 
       clr = doc.colour_table[0]
-      clr.use_default?.should be_true
+      expect(clr.use_default?).to be true
 
       clr = doc.colour_table[1]
-      clr.red.should == 255
-      clr.green.should == 0
-      clr.blue.should == 0
+      expect(clr.red).to eq 255
+      expect(clr.green).to eq 0
+      expect(clr.blue).to eq 0
     end
 
     context '#parse_colour_table' do
@@ -342,23 +342,23 @@ describe RubyRTF::Parser do
         src = '\red2\green55\blue23;}'
         parser.parse_colour_table(src, 0)
         tbl = doc.colour_table
-        tbl[0].red.should == 2
-        tbl[0].green.should == 55
-        tbl[0].blue.should == 23
+        expect(tbl[0].red).to eq 2
+        expect(tbl[0].green).to eq 55
+        expect(tbl[0].blue).to eq 23
       end
 
       it 'handles ctintN' do
         src = '\ctint22\red2\green55\blue23;}'
         parser.parse_colour_table(src, 0)
         tbl = doc.colour_table
-        tbl[0].tint.should == 22
+        expect(tbl[0].tint).to eq 22
       end
 
       it 'handles cshadeN' do
         src = '\cshade11\red2\green55\blue23;}'
         parser.parse_colour_table(src, 0)
         tbl = doc.colour_table
-        tbl[0].shade.should == 11
+        expect(tbl[0].shade).to eq 11
       end
 
       %w(cmaindarkone cmainlightone cmaindarktwo cmainlighttwo caccentone
@@ -369,7 +369,7 @@ describe RubyRTF::Parser do
           src = "\\#{theme}\\red11\\green22\\blue33;}"
           parser.parse_colour_table(src, 0)
           tbl = doc.colour_table
-          tbl[0].theme.should == theme[1..-1].to_sym
+          expect(tbl[0].theme).to eq theme[1..-1].to_sym
         end
       end
 
@@ -377,10 +377,10 @@ describe RubyRTF::Parser do
         src = "\\cshade11\\red2\\green55\r\n\\blue23;}"
         parser.parse_colour_table(src, 0)
         tbl = doc.colour_table
-        tbl[0].shade.should == 11
-        tbl[0].red.should == 2
-        tbl[0].green.should == 55
-        tbl[0].blue.should == 23
+        expect(tbl[0].shade).to eq 11
+        expect(tbl[0].red).to eq 2
+        expect(tbl[0].green).to eq 55
+        expect(tbl[0].blue).to eq 23
       end
     end
   end
@@ -399,35 +399,47 @@ describe RubyRTF::Parser do
       doc.font_table[0] = font
 
       parser.handle_control(:f, 0, nil, 0)
-      parser.current_section[:modifiers][:font].should == font
+      expect(parser.current_section[:modifiers][:font]).to eq font
     end
 
     it 'sets the font size' do
       parser.handle_control(:fs, 61, nil, 0)
-      parser.current_section[:modifiers][:font_size].should == 30.5
+      expect(parser.current_section[:modifiers][:font_size]).to eq 30.5
     end
 
     it 'sets bold' do
       parser.handle_control(:b, nil, nil, 0)
-      parser.current_section[:modifiers][:bold].should be_true
+      expect(parser.current_section[:modifiers][:bold]).to be true
     end
 
-    it 'sets underline' do
+     it 'unsets bold' do
+       parser.current_section[:modifiers][:bold] = true
+       parser.handle_control(:b, '0', nil, 0)
+       expect(parser.current_section[:modifiers][:bold]).to be_falsey
+     end
+
+     it 'sets underline' do
       parser.handle_control(:ul, nil, nil, 0)
-      parser.current_section[:modifiers][:underline].should be_true
+      expect(parser.current_section[:modifiers][:underline]).to be true
     end
 
     it 'sets italic' do
       parser.handle_control(:i, nil, nil, 0)
-      parser.current_section[:modifiers][:italic].should be_true
+      expect(parser.current_section[:modifiers][:italic]).to be true
     end
 
-    %w(rquote lquote).each do |quote|
+     it 'unsets bold' do
+       parser.current_section[:modifiers][:italic] = true
+       parser.handle_control(:i, '0', nil, 0)
+       expect(parser.current_section[:modifiers][:italic]).to be_falsey
+     end
+
+     %w(rquote lquote).each do |quote|
       it "sets a #{quote}" do
         parser.current_section[:text] = 'My code'
         parser.handle_control(quote.to_sym, nil, nil, 0)
-        doc.sections.last[:text].should == "'"
-        doc.sections.last[:modifiers][quote.to_sym].should be_true
+        expect(doc.sections.last[:text]).to eq "'"
+        expect(doc.sections.last[:modifiers][quote.to_sym]).to be true
       end
     end
 
@@ -435,40 +447,40 @@ describe RubyRTF::Parser do
       it "sets a #{quote}" do
         parser.current_section[:text] = 'My code'
         parser.handle_control(quote.to_sym, nil, nil, 0)
-        doc.sections.last[:text].should == '"'
-        doc.sections.last[:modifiers][quote.to_sym].should be_true
+        expect(doc.sections.last[:text]).to eq '"'
+        expect(doc.sections.last[:modifiers][quote.to_sym]).to be true
       end
     end
 
     it 'sets a hex character' do
       parser.current_section[:text] = 'My code'
       parser.handle_control(:hex, '~', nil, 0)
-      parser.current_section[:text].should == 'My code~'
+      expect(parser.current_section[:text]).to eq 'My code~'
     end
 
     it 'sets a unicode character < 1000 (char 643)' do
       parser.current_section[:text] = 'My code'
       parser.handle_control(:u, 643, nil, 0)
-      parser.current_section[:text].should == 'My codeك'
+      expect(parser.current_section[:text]).to eq 'My codeك'
     end
 
     it 'sets a unicode character < 32768 (char 2603)' do
       parser.current_section[:text] = 'My code'
       parser.handle_control(:u, 2603, nil, 0)
-      parser.current_section[:text].should == 'My code☃'
+      expect(parser.current_section[:text]).to eq 'My code☃'
     end
 
     it 'sets a unicode character < 32768 (char 21340)' do
       parser.current_section[:text] = 'My code'
       parser.handle_control(:u, 21340, nil, 0)
-      parser.current_section[:text].should == 'My code卜'
+      expect(parser.current_section[:text]).to eq 'My code卜'
     end
 
 
     it 'sets a unicode character > 32767 (char 36,947)' do
       parser.current_section[:text] = 'My code'
       parser.handle_control(:u, -28589, nil, 0)
-      parser.current_section[:text].should == 'My code道'
+      expect(parser.current_section[:text]).to eq 'My code道'
     end
 
     context "uc0 skips a byte in the next unicode char" do
@@ -476,15 +488,15 @@ describe RubyRTF::Parser do
         parser.current_section[:text] = 'My code '
         parser.handle_control(:uc, 0, nil, 0)
         parser.handle_control(:u, 8278, nil, 0)
-        parser.current_section[:text].should == 'My code x'
+        expect(parser.current_section[:text]).to eq 'My code x'
       end
 
       it "u8232 - does newline" do
         parser.current_section[:text] = "end."
         parser.handle_control(:uc, 0, nil, 0)
         parser.handle_control(:u, 8232, nil, 0)
-        doc.sections.last[:modifiers][:newline].should be_true
-        doc.sections.last[:text].should == "\n"
+        expect(doc.sections.last[:modifiers][:newline]).to be true
+        expect(doc.sections.last[:text]).to eq "\n"
       end
     end
 
@@ -493,69 +505,69 @@ describe RubyRTF::Parser do
         it "sets from #{type}" do
           parser.current_section[:text] = "end."
           parser.handle_control(type.to_sym, nil, nil, 0)
-          doc.sections.last[:modifiers][:newline].should be_true
-          doc.sections.last[:text].should == "\n"
+          expect(doc.sections.last[:modifiers][:newline]).to be true
+          expect(doc.sections.last[:text]).to eq "\n"
         end
       end
 
       it 'ignores \r' do
         parser.current_section[:text] = "end."
         parser.handle_control(:"\r", nil, nil, 0)
-        parser.current_section[:text].should == "end."
+        expect(parser.current_section[:text]).to eq "end."
       end
     end
 
     it 'inserts a \tab' do
       parser.current_section[:text] = "end."
       parser.handle_control(:tab, nil, nil, 0)
-      doc.sections.last[:modifiers][:tab].should be_true
-      doc.sections.last[:text].should == "\t"
+      expect(doc.sections.last[:modifiers][:tab]).to be true
+      expect(doc.sections.last[:text]).to eq "\t"
     end
 
     it 'inserts a \super' do
       parser.current_section[:text] = "end."
       parser.handle_control(:super, nil, nil, 0)
 
-      parser.current_section[:modifiers][:superscript].should be_true
-      parser.current_section[:text].should == ""
+      expect(parser.current_section[:modifiers][:superscript]).to be true
+      expect(parser.current_section[:text]).to eq ""
     end
 
     it 'inserts a \sub' do
       parser.current_section[:text] = "end."
       parser.handle_control(:sub, nil, nil, 0)
 
-      parser.current_section[:modifiers][:subscript].should be_true
-      parser.current_section[:text].should == ""
+      expect(parser.current_section[:modifiers][:subscript]).to be true
+      expect(parser.current_section[:text]).to eq ""
     end
 
     it 'inserts a \strike' do
       parser.current_section[:text] = "end."
       parser.handle_control(:strike, nil, nil, 0)
 
-      parser.current_section[:modifiers][:strikethrough].should be_true
-      parser.current_section[:text].should == ""
+      expect(parser.current_section[:modifiers][:strikethrough]).to be true
+      expect(parser.current_section[:text]).to eq ""
     end
 
     it 'inserts a \scaps' do
       parser.current_section[:text] = "end."
       parser.handle_control(:scaps, nil, nil, 0)
 
-      parser.current_section[:modifiers][:smallcaps].should be_true
-      parser.current_section[:text].should == ""
+      expect(parser.current_section[:modifiers][:smallcaps]).to be true
+      expect(parser.current_section[:text]).to eq ""
     end
 
     it 'inserts an \emdash' do
       parser.current_section[:text] = "end."
       parser.handle_control(:emdash, nil, nil, 0)
-      doc.sections.last[:modifiers][:emdash].should be_true
-      doc.sections.last[:text].should == "--"
+      expect(doc.sections.last[:modifiers][:emdash]).to be true
+      expect(doc.sections.last[:text]).to eq "--"
     end
 
     it 'inserts an \endash' do
       parser.current_section[:text] = "end."
       parser.handle_control(:endash, nil, nil, 0)
-      doc.sections.last[:modifiers][:endash].should be_true
-      doc.sections.last[:text].should == "-"
+      expect(doc.sections.last[:modifiers][:endash]).to be true
+      expect(doc.sections.last[:text]).to eq "-"
     end
 
     context 'escapes' do
@@ -563,7 +575,7 @@ describe RubyRTF::Parser do
         it "inserts an escaped #{escape}" do
           parser.current_section[:text] = "end."
           parser.handle_control(escape.to_sym, nil, nil, 0)
-          parser.current_section[:text].should == "end.#{escape}"
+          expect(parser.current_section[:text]).to eq "end.#{escape}"
         end
       end
     end
@@ -571,7 +583,7 @@ describe RubyRTF::Parser do
     it 'adds a new section for a par command' do
       parser.current_section[:text] = 'end.'
       parser.handle_control(:par, nil, nil, 0)
-      parser.current_section[:text].should == ""
+      expect(parser.current_section[:text]).to eq ""
     end
 
     %w(pard plain).each do |type|
@@ -580,8 +592,8 @@ describe RubyRTF::Parser do
         parser.current_section[:modifiers][:italic] = true
         parser.handle_control(type.to_sym, nil, nil, 0)
 
-        parser.current_section[:modifiers].has_key?(:bold).should be_false
-        parser.current_section[:modifiers].has_key?(:italic).should be_false
+        expect(parser.current_section[:modifiers].has_key?(:bold)).to be false
+        expect(parser.current_section[:modifiers].has_key?(:italic)).to be false
       end
     end
 
@@ -589,86 +601,86 @@ describe RubyRTF::Parser do
       it 'sets the foreground colour' do
         doc.colour_table << RubyRTF::Colour.new(255, 0, 255)
         parser.handle_control(:cf, 0, nil, 0)
-        parser.current_section[:modifiers][:foreground_colour].to_s.should == "[255, 0, 255]"
+        expect(parser.current_section[:modifiers][:foreground_colour].to_s).to eq "[255, 0, 255]"
       end
 
       it 'sets the background colour' do
         doc.colour_table << RubyRTF::Colour.new(255, 0, 255)
         parser.handle_control(:cb, 0, nil, 0)
-        parser.current_section[:modifiers][:background_colour].to_s.should == "[255, 0, 255]"
+        expect(parser.current_section[:modifiers][:background_colour].to_s).to eq "[255, 0, 255]"
       end
     end
 
     context 'justification' do
       it 'handles left justify' do
         parser.handle_control(:ql, nil, nil, 0)
-        parser.current_section[:modifiers][:justification].should == :left
+        expect(parser.current_section[:modifiers][:justification]).to eq :left
       end
 
       it 'handles right justify' do
         parser.handle_control(:qr, nil, nil, 0)
-        parser.current_section[:modifiers][:justification].should == :right
+        expect(parser.current_section[:modifiers][:justification]).to eq :right
       end
 
       it 'handles full justify' do
         parser.handle_control(:qj, nil, nil, 0)
-        parser.current_section[:modifiers][:justification].should == :full
+        expect(parser.current_section[:modifiers][:justification]).to eq :full
       end
 
       it 'handles centered' do
         parser.handle_control(:qc, nil, nil, 0)
-        parser.current_section[:modifiers][:justification].should == :center
+        expect(parser.current_section[:modifiers][:justification]).to eq :center
       end
     end
 
     context 'indenting' do
       it 'handles first line indent' do
         parser.handle_control(:fi, 1000, nil, 0)
-        parser.current_section[:modifiers][:first_line_indent].should == 50
+        expect(parser.current_section[:modifiers][:first_line_indent]).to eq 50
       end
 
       it 'handles left indent' do
         parser.handle_control(:li, 1000, nil, 0)
-        parser.current_section[:modifiers][:left_indent].should == 50
+        expect(parser.current_section[:modifiers][:left_indent]).to eq 50
       end
 
       it 'handles right indent' do
         parser.handle_control(:ri, 1000, nil, 0)
-        parser.current_section[:modifiers][:right_indent].should == 50
+        expect(parser.current_section[:modifiers][:right_indent]).to eq 50
       end
     end
 
     context 'margins' do
       it 'handles left margin' do
         parser.handle_control(:margl, 1000, nil, 0)
-        parser.current_section[:modifiers][:left_margin].should == 50
+        expect(parser.current_section[:modifiers][:left_margin]).to eq 50
       end
 
       it 'handles right margin' do
         parser.handle_control(:margr, 1000, nil, 0)
-        parser.current_section[:modifiers][:right_margin].should == 50
+        expect(parser.current_section[:modifiers][:right_margin]).to eq 50
       end
 
       it 'handles top margin' do
         parser.handle_control(:margt, 1000, nil, 0)
-        parser.current_section[:modifiers][:top_margin].should == 50
+        expect(parser.current_section[:modifiers][:top_margin]).to eq 50
       end
 
       it 'handles bottom margin' do
         parser.handle_control(:margb, 1000, nil, 0)
-        parser.current_section[:modifiers][:bottom_margin].should == 50
+        expect(parser.current_section[:modifiers][:bottom_margin]).to eq 50
       end
     end
 
     context 'paragraph spacing' do
       it 'handles space before' do
         parser.handle_control(:sb, 1000, nil, 0)
-        parser.current_section[:modifiers][:space_before].should == 50
+        expect(parser.current_section[:modifiers][:space_before]).to eq 50
       end
 
       it 'handles space after' do
         parser.handle_control(:sa, 1000, nil, 0)
-        parser.current_section[:modifiers][:space_after].should == 50
+        expect(parser.current_section[:modifiers][:space_after]).to eq 50
       end
     end
 
@@ -676,33 +688,55 @@ describe RubyRTF::Parser do
       it 'handles :~' do
         parser.current_section[:text] = "end."
         parser.handle_control(:~, nil, nil, 0)
-        doc.sections.last[:modifiers][:nbsp].should be_true
-        doc.sections.last[:text].should == " "
+        expect(doc.sections.last[:modifiers][:nbsp]).to be true
+        expect(doc.sections.last[:text]).to eq " "
       end
     end
   end
 
   context 'sections' do
     it 'has sections' do
-      doc.sections.should_not be_nil
+      expect(doc.sections).not_to be_nil
     end
 
     it 'sets an initial section' do
-      parser.current_section.should_not be_nil
+      expect(parser.current_section).not_to be_nil
+    end
+
+    context 'parsing full doc' do
+      it 'parses changes to bold' do
+        src = '{\rtf1\ansi\ansicpg1252\deff0\deflang1031{\fonttbl{\f0\fnil\fcharset0 MS Sans Serif;}}\viewkind4\uc1\par\pard Second paragraph with \b bold\b0  and \ul underline\ulnone  and \i italics\i0 , and now back to normal.}'
+        d = parser.parse(src)
+
+        sect = d.sections
+
+        expect(sect.length).to eq 9
+      end
+
+      it 'parses font size changes' do
+        src = '{\rtf1\ansi\ansicpg1252\deff0\deflang1031{\fonttbl{\f0\fnil\fcharset0 MS Sans Serif;}}\viewkind4\uc1\par\pard\f0\fs24 Heading\fs16 smaller }'
+        d = parser.parse(src)
+
+        sect = d.sections
+
+        expect(sect.length).to eq 4
+        expect(sect[-2][:modifiers][:font_size]).to eq 12.0
+        expect(sect[-1][:modifiers][:font_size]).to eq 8.0
+      end
     end
 
     context '#add_section!' do
       it 'does not add a section if the current :text is empty' do
         d = parser
         d.add_section!
-        doc.sections.length.should == 0
+        expect(doc.sections.length).to eq 0
       end
 
       it 'adds a section of the current section has text' do
         d = parser
         d.current_section[:text] = "Test"
         d.add_section!
-        doc.sections.length.should == 1
+        expect(doc.sections.length).to eq 1
       end
 
       it 'inherits the modifiers from the parent section' do
@@ -716,8 +750,8 @@ describe RubyRTF::Parser do
         d.current_section[:modifiers][:underline] = true
 
         sections = doc.sections
-        sections.first[:modifiers].should == {:bold => true, :italics => true}
-        d.current_section[:modifiers].should == {:bold => true, :italics => true, :underline => true}
+        expect(sections.first[:modifiers]).to eq({:bold => true, :italics => true})
+        expect(d.current_section[:modifiers]).to eq({:bold => true, :italics => true, :underline => true})
       end
     end
 
@@ -732,8 +766,8 @@ describe RubyRTF::Parser do
         d.current_section[:modifiers][:underline] = true
 
         sections = doc.sections
-        sections.first[:modifiers].should == {:bold => true, :italics => true}
-        d.current_section[:modifiers].should == {:underline => true}
+        expect(sections.first[:modifiers]).to eq({:bold => true, :italics => true})
+        expect(d.current_section[:modifiers]).to eq({:underline => true})
       end
     end
 
@@ -747,28 +781,28 @@ describe RubyRTF::Parser do
 
         d.current_section[:modifiers][:underline] = true
 
-        doc.sections.length.should == 1
-        doc.sections.first[:text].should == 'New text'
+        expect(doc.sections.length).to eq 1
+        expect(doc.sections.first[:text]).to eq 'New text'
       end
     end
 
     context 'tables' do
       def compare_table_results(table, data)
-        table.rows.length.should == data.length
+        expect(table.rows.length).to eq data.length
 
         data.each_with_index do |row, idx|
           end_positions = table.rows[idx].end_positions
           row[:end_positions].each_with_index do |size, cidx|
-            end_positions[cidx].should == size
+            expect(end_positions[cidx]).to eq size
           end
 
           cells = table.rows[idx].cells
-          cells.length.should == row[:values].length
+          expect(cells.length).to eq row[:values].length
 
           row[:values].each_with_index do |items, vidx|
             sects = cells[vidx].sections
             items.each_with_index do |val, iidx|
-              sects[iidx][:text].should == val
+              expect(sects[iidx][:text]).to eq val
             end
           end
         end
@@ -782,11 +816,11 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
 
-        sect[1][:modifiers][:table].should_not be_nil
+        expect(sect[1][:modifiers][:table]).not_to be_nil
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72], :values => [['fee.']]}])
@@ -800,7 +834,7 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         table = d.sections[1][:modifiers][:table]
-        table.half_gap.should == 9
+        expect(table.half_gap).to eq 9
       end
 
       it 'parses a \trleft240' do
@@ -811,7 +845,7 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         table = d.sections[1][:modifiers][:table]
-        table.left_margin.should == 12
+        expect(table.left_margin).to eq 12
       end
 
       it 'parses a single row with multiple columns' do
@@ -825,11 +859,11 @@ describe RubyRTF::Parser do
 
         sect = d.sections
 
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
 
-        sect[1][:modifiers][:table].should_not be_nil
+        expect(sect[1][:modifiers][:table]).not_to be_nil
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72, 144, 50], :values => [['fee.'], ['fie.'], ['foe.']]}])
@@ -849,11 +883,11 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
 
-        sect[1][:modifiers][:table].should_not be_nil
+        expect(sect[1][:modifiers][:table]).not_to be_nil
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72, 144, 50], :values => [['fee.'], ['fie.'], ['foe.']]},
@@ -874,11 +908,11 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
 
-        sect[1][:modifiers][:table].should_not be_nil
+        expect(sect[1][:modifiers][:table]).not_to be_nil
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72, 144, 50], :values => [['fee.'], ['fie.'], ['foe.']]},
@@ -893,9 +927,9 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72], :values => [["fee.", "\n", "fie."]]}])
@@ -911,9 +945,9 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72, 144, 50], :values => [["fee."], [""], ["fie."]]}])
@@ -929,9 +963,9 @@ describe RubyRTF::Parser do
 
         sect = d.sections
 
-        sect.length.should == 3
-        sect[0][:text].should == 'Before Table'
-        sect[2][:text].should == 'After table'
+        expect(sect.length).to eq 3
+        expect(sect[0][:text]).to eq 'Before Table'
+        expect(sect[2][:text]).to eq 'After table'
         table = sect[1][:modifiers][:table]
 
         compare_table_results(table, [{:end_positions => [72, 144, 50],
@@ -957,9 +991,9 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-        sect.length.should == 2
-        sect[1][:text].should == ' Improved animal'
-        sect[1][:modifiers].should == {}
+        expect(sect.length).to eq 2
+        expect(sect[1][:text]).to eq ' Improved animal'
+        expect(sect[1][:modifiers]).to eq({})
 
         table = sect[0][:modifiers][:table]
         compare_table_results(table, [{:end_positions => [72], :values => [['Familiar ']]}])

@@ -5,11 +5,11 @@ describe RubyRTF::Font do
 
   it 'has a name' do
     font.name = 'Arial'
-    font.name.should == 'Arial'
+    expect(font.name).to eq 'Arial'
   end
 
   it 'has a command' do
     font.family_command = :swiss
-    font.family_command.should == :swiss
+    expect(font.family_command).to eq :swiss
   end
 end
