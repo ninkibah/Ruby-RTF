@@ -139,7 +139,7 @@ module RubyRTF
       when :b then
         if val
           @formatting_stack.pop
-          add_section!
+          add_section!(:bold => false)
         else
           add_section!(:bold => true)
         end
@@ -147,7 +147,7 @@ module RubyRTF
       when :i then
         if val
           @formatting_stack.pop
-          add_section!
+          add_section!(:italic => false)
         else
           add_section!(:italic => true)
         end
@@ -160,8 +160,8 @@ module RubyRTF
           add_section!(:underline => true)
         end
       when :ulnone then
-        current_section[:modifiers][:underline] = false
         @formatting_stack.pop
+        add_section!(:underline => false)
 
       when :super then add_section!(:superscript => true)
       when :sub then add_section!(:subscript => true)
