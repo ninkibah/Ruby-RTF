@@ -59,7 +59,7 @@ module RubyRTF
       end
 
       unless current_section[:text].empty?
-        current_context << current_section
+        current_context << clean_section_modifiers(current_section)
       end
 
       raise RubyRTF::InvalidDocument.new("Unbalanced {}s") unless group_level == 0
@@ -498,7 +498,7 @@ module RubyRTF
     # Keys that aren't inherited
     BLACKLISTED = [:paragraph, :newline, :tab, :lquote, :rquote, :ldblquote, :rdblquote]
     def force_section!(mods = {}, text =  nil)
-      current_context << @current_section
+      current_context << clean_section_modifiers(@current_section)
 
       fs = formatting_stack.last || {}
       fs.each_pair do |k, v|
@@ -508,6 +508,17 @@ module RubyRTF
       formatting_stack.push(mods)
 
       @current_section = {:text => (text || ''), :modifiers => mods}
+    end
+
+    def clean_section_modifiers(section)
+      cleaned_mods = {}
+      section[:modifiers].each do |k, v|
+        unless v == false || v == nil || v == ''
+          cleaned_mods[k] = v
+        end
+      end
+      section[:modifiers] = cleaned_mods
+      section
     end
 
     # Resets the current section to default formating

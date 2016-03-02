@@ -709,7 +709,7 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
-
+        sect.each {|s| puts "#{s[:text]}=>#{s[:modifiers]}" }
         expect(sect.length).to eq 9
       end
 
@@ -718,6 +718,7 @@ describe RubyRTF::Parser do
         d = parser.parse(src)
 
         sect = d.sections
+        sect.each {|s| puts "#{s[:text]}=>#{s[:modifiers]}" }
 
         expect(sect.length).to eq 4
         expect(sect[-2][:modifiers][:font_size]).to eq 12.0
